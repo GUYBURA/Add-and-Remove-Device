@@ -21,6 +21,7 @@ app.get('/api/devices', (req, res) => {
     const sql = `
         SELECT device_id AS id, device_id AS name, status
         FROM sensor_weather_station
+        WHERE status = 'on' OR status = 'off';
     `;
     db.query(sql, (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -66,16 +67,21 @@ app.get('/api/stations', (req, res) => {
 });
 
 app.post('/api/device', (req, res) => {
-    const { device_id, station_signature } = req.body;
+    const device_id = req.body.device_id?.trim();
+    const station_signature = req.body.station_signature?.trim();
+
 
     if (!device_id || !station_signature) {
         return res.status(400).json({ message: 'กรุณาระบุ device_id และ station_signature' });
     }
 
+    // ✅ ตรวจสอบว่า device_id มีอยู่ และ status เป็น 'not register'
     const checkSql = `SELECT * FROM sensor_weather_station WHERE device_id = ? LIMIT 1`;
 
     db.query(checkSql, [device_id], (err, results) => {
-        if (err) return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการตรวจสอบอุปกรณ์', error: err.message });
+        if (err) {
+            return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการตรวจสอบอุปกรณ์', error: err.message });
+        }
 
         if (results.length === 0) {
             return res.status(404).json({ message: 'ไม่พบอุปกรณ์นี้ในระบบ' });
@@ -83,21 +89,28 @@ app.post('/api/device', (req, res) => {
 
         const device = results[0];
 
-        if (device.status !== 'off') {
-            return res.status(400).json({ message: 'อุปกรณ์นี้กำลังถูกใช้งานอยู่ ไม่สามารถเพิ่มซ้ำได้' });
+        if (device.status !== 'not register') {
+            const statusMessages = {
+                on: 'อุปกรณ์นี้อยู่ในสถานะ เปิดใช้งาน\nไม่สามารถลงทะเบียนใหม่ได้',
+                off: 'อุปกรณ์นี้อยู่ในสถานะ ปิดใช้งาน\nไม่สามารถลงทะเบียนใหม่ได้',
+            };
+
+            return res.status(400).json({ message: statusMessages[device.status] || 'ไม่สามารถลงทะเบียนได้ในสถานะนี้' });
         }
 
-        // ✅ ถ้าเจอและ status = 'off' → ทำการอัปเดต
+        // ✅ ทำการอัปเดตอุปกรณ์ให้เป็นสถานะ 'off' และผูก station
         const updateSql = `
-        UPDATE sensor_weather_station
-        SET status = 'on', station_signature = ?
-        WHERE device_id = ?
-      `;
+            UPDATE sensor_weather_station
+            SET status = 'off', station_signature = ?
+            WHERE device_id = ?
+        `;
 
-        db.query(updateSql, [station_signature, device_id], (updateErr, updateRes) => {
-            if (updateErr) return res.status(500).json({ message: 'อัปเดตอุปกรณ์ไม่สำเร็จ', error: updateErr.message });
+        db.query(updateSql, [station_signature, device_id], (updateErr) => {
+            if (updateErr) {
+                return res.status(500).json({ message: 'อัปเดตอุปกรณ์ไม่สำเร็จ', error: updateErr.message });
+            }
 
-            res.json({ message: 'เปิดใช้งานอุปกรณ์สำเร็จและผูกกับศูนย์ใหม่แล้ว' });
+            res.json({ message: 'ลงทะเบียนอุปกรณ์สำเร็จ' });
         });
     });
 });

@@ -8,6 +8,8 @@ function AddDevicePage() {
     const [deviceId, setDeviceId] = useState('');
     const [selectedStation, setSelectedStation] = useState('');
     const [stations, setStations] = useState([]);
+    const [showPopup, setShowPopup] = useState(false);
+    const [popupMessage, setPopupMessage] = useState('');
 
     useEffect(() => {
         const fetchStations = async () => {
@@ -24,7 +26,11 @@ function AddDevicePage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!deviceId || !selectedStation) return alert('กรุณากรอกข้อมูลให้ครบ');
+        if (!deviceId || !selectedStation) {
+            setPopupMessage('กรุณากรอกข้อมูลให้ครบ');
+            setShowPopup(true);
+            return;
+        }
 
         try {
             const res = await fetch('http://localhost:3001/api/device', {
@@ -33,15 +39,17 @@ function AddDevicePage() {
                 body: JSON.stringify({ device_id: deviceId, station_signature: selectedStation }),
             });
 
+            const data = await res.json();
+
             if (res.ok) {
-                alert('เพิ่มอุปกรณ์สำเร็จ');
-                navigate('/');
+                setPopupMessage('✅ เพิ่มอุปกรณ์สำเร็จ');
             } else {
-                const data = await res.json();
-                alert(data.message || 'เกิดข้อผิดพลาด');
+                setPopupMessage(`❌ ${data.message || 'เกิดข้อผิดพลาด'}`);
             }
         } catch (err) {
-            alert('ไม่สามารถเชื่อมต่อ API ได้');
+            setPopupMessage('❌ ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
+        } finally {
+            setShowPopup(true);
         }
     };
 
@@ -125,11 +133,35 @@ function AddDevicePage() {
                         }),
                     }}
                 />
+                {showPopup && (
+                    <div className="popup-overlay">
+                        <div className="popup-box">
+                            <p>{popupMessage}</p>
+                            <div className="popup-actions">
+                                <button className="confirm-btn" onClick={() => {
+                                    setShowPopup(false);
+                                    if (popupMessage.includes('สำเร็จ')) {
+                                        navigate('/');
+                                    }
+                                }}>
+                                    ปิด
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
 
 
 
                 <div className="form-actions">
-                    <button type="submit" className="confirm-btn">ยืนยัน</button>
+                    <button
+                        type="submit"
+                        className="confirm-btn"
+                    >
+                        ยืนยัน
+                    </button>
+
                     <button type="button" className="cancel-btn" onClick={() => navigate('/')}>
                         ยกเลิก
                     </button>

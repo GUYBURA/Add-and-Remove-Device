@@ -103,3 +103,43 @@
     font-weight: bold;
     color: white;
 }
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.popup-box {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    width: 300px;
+}
+
+.popup-box p {
+    font-size: 16px;
+    white-space: pre-line;
+    text-align: center;
+}
+
+
+.popup-sub {
+    color: #333;
+    font-size: 14px;
+}
+
+.popup-actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 16px;
+}
