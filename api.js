@@ -19,15 +19,15 @@ const db = mysql.createConnection({
 // ✅ GET /api/devices — ดึงรายชื่อทั้งหมด
 app.get('/api/devices', (req, res) => {
     const sql = `
-    SELECT device_id AS id, device_id AS name
-    FROM sensor_weather_station
-    WHERE status = 'on'
-  `;
+        SELECT device_id AS id, device_id AS name, status
+        FROM sensor_weather_station
+    `;
     db.query(sql, (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(results);
     });
 });
+
 
 // ✅ GET /api/device/:id — ดึง station_signature ของอุปกรณ์
 app.get('/api/device/:id', (req, res) => {

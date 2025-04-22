@@ -78,13 +78,21 @@ function MainPage() {
       <div className="device-list">
         {devices.map((device) => (
           <div className="device-item" key={device.id}>
-            <span>{device.name.replace(/^weather\s*/i, '')}</span>
+            <div className="device-content">
+              <span className={`status-dot ${device.status === 'on' ? 'green-dot' : 'red-dot'}`} />
+              <span className="device-name">{device.name}</span>
+            </div>
             <button className="delete-button" onClick={() => handleDelete(device.id)}>
-              <img src="/images/material-symbols--delete.svg" alt="delete" className="trash-icon" />
+              <img
+                src="/images/material-symbols--delete.svg"
+                alt="delete"
+                className="trash-icon"
+              />
             </button>
           </div>
         ))}
       </div>
+
 
       <div className="add-button-container">
         <button className="add-button" onClick={() => navigate('/add')}>
