@@ -101,7 +101,7 @@ function AddDevicePage() {
                             borderRadius: 20,
                             border: '2px solid #50BE54',
                             borderColor: state.isFocused ? '#c2b23d' : '#E5D68E',
-                            boxShadow: state.isFocused ? '0 0 4px rgba(80, 190, 84, 0.59)' : 'none',
+                            boxShadow: state.isFocused ? '0 0 4px rgba(80, 190, 84, 0.5)' : 'none',
                             padding: '4px 6px',
                             fontWeight: 'bold',
                             fontSize: '15px',
@@ -124,9 +124,9 @@ function AddDevicePage() {
                             width: '100%',
                             boxSizing: 'border-box',
                             backgroundColor: state.isSelected
-                                ? '#50be5479'
+                                ? 'rgba(80, 190, 84, 0.5)'
                                 : state.isFocused
-                                    ? '#50be5479'
+                                    ? 'rgba(80, 190, 84, 0.5)'
                                     : '#fff',
                             color: '#000',
                             fontWeight: state.isSelected ? 'bold' : 'normal',

@@ -26,7 +26,7 @@ body {
 }
 
 /* ====== หัวสถานีวัดสภาพอากาศใหม่ ====== */
-.greenhouse-header {
+.pump-header {
   display: flex;
   width: fit-content;
   border-radius: 15px;
@@ -38,7 +38,7 @@ body {
 }
 
 .icon-side {
-  background-color: #50BE54;
+  background-color: #5073BE;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -53,7 +53,7 @@ body {
 }
 
 .label-side {
-  background-color: #50be5479;
+  background-color: rgba(80, 115, 190, 0.5);
   display: flex;
   align-items: center;
   padding: 16px 70px;
@@ -154,7 +154,7 @@ body {
 }
 
 .add-button {
-  border: 2px solid #50BE54;
+  border: 2px solid #5073BE;
   background: white;
   border-radius: 15px;
   padding: 5px 25px;
@@ -166,7 +166,7 @@ body {
 }
 
 .add-button:hover {
-  background: #50be5479;
+  background: rgba(80, 115, 190, 0.5);
   transform: scale(1.05);
 }
 
