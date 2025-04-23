@@ -14,7 +14,7 @@ function MainPage() {
   useEffect(() => {
     const loadDevices = async () => {
       try {
-        const res = await fetch('http://localhost:3001/api/devices');
+        const res = await fetch('http://localhost:3001/api/weather_station/device');
         const data = await res.json();
         setDevices(data);
       } catch (err) {
@@ -31,7 +31,7 @@ function MainPage() {
     setShowModal(true);
 
     try {
-      const res = await fetch(`http://localhost:3001/api/device/${id}`);
+      const res = await fetch(`http://localhost:3001/api/weather_station/device/${id}`);
       const data = await res.json();
       setDeviceCenter(data.center || 'ไม่พบข้อมูลศูนย์');
     } catch (err) {
@@ -43,7 +43,7 @@ function MainPage() {
 
   const confirmDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:3001/api/device/${selectedDevice}`, {
+      const res = await fetch(`http://localhost:3001/api/weather_station/delete/device/${selectedDevice}`, {
         method: 'DELETE',
       });
       const data = await res.json();

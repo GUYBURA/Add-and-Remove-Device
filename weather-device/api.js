@@ -17,7 +17,7 @@ const db = mysql.createConnection({
 });
 
 // ✅ GET /api/devices — ดึงรายชื่อทั้งหมด
-app.get('/api/devices', (req, res) => {
+app.get('/api/weather_station/device', (req, res) => {
     const sql = `
         SELECT device_id AS id, device_id AS name, status
         FROM sensor_weather_station
@@ -31,7 +31,7 @@ app.get('/api/devices', (req, res) => {
 
 
 // ✅ GET /api/device/:id — ดึง station_signature ของอุปกรณ์
-app.get('/api/device/:id', (req, res) => {
+app.get('/api/weather_station/device/:id', (req, res) => {
     const { id } = req.params;
     const sql = `
       SELECT sl.name AS center
@@ -47,7 +47,7 @@ app.get('/api/device/:id', (req, res) => {
     });
 });
 // ✅ DELETE /api/device/:id — ลบอุปกรณ์จากฐานข้อมูล
-app.delete('/api/device/:id', (req, res) => {
+app.delete('/api/weather_station/delete/device/:id', (req, res) => {
     const { id } = req.params;
     const sql = `DELETE FROM sensor_weather_station WHERE device_id = ?`;
     db.query(sql, [id], (err, result) => {
@@ -58,7 +58,7 @@ app.delete('/api/device/:id', (req, res) => {
     });
 });
 // ดึง station ทั้งหมด
-app.get('/api/stations', (req, res) => {
+app.get('/api/weather_station/stations', (req, res) => {
     const sql = `SELECT id_station, name FROM station_list WHERE is_use = 1`;
     db.query(sql, (err, results) => {
         if (err) return res.status(500).json({ message: 'ผิดพลาด', error: err.message });
@@ -66,7 +66,7 @@ app.get('/api/stations', (req, res) => {
     });
 });
 
-app.post('/api/device', (req, res) => {
+app.post('/api/weather_station/add/device', (req, res) => {
     const device_id = req.body.device_id?.trim();
     const station_signature = req.body.station_signature?.trim();
 

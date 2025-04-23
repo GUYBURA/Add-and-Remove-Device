@@ -1,0 +1,145 @@
+.add-form {
+    width: 80%;
+    max-width: 340px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.add-form h3 {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.add-form label {
+    font-weight: 500;
+}
+
+.add-form input {
+    padding: 12px 16px;
+    border: 2px solid #50BE54;
+    border-radius: 20px;
+    font-size: 16px;
+    background: white;
+}
+
+.add-form input:focus {
+    outline: none;
+    box-shadow: 0 0 4px rgba(229, 214, 142, 0.5);
+    border-color: #50BE54;
+}
+
+.add-form select {
+    padding: 12px 16px;
+    border: 2px solid #50BE54;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    background-color: #ffffff;
+    appearance: none;
+
+    background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+
+    padding-right: 40px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.add-form select:hover {
+    border-color: #50BE54;
+}
+
+.add-form select:focus {
+    background-color: #50BE54;
+    border-color: #50BE54;
+    outline: none;
+    box-shadow: 0 0 5px #50BE54;
+}
+
+/* ✅ ปรับสไตล์เมนู dropdown (browser บางตัวรองรับ pseudo-element option) */
+.add-form select option {
+    appearance: none;
+    border: 2px solid #50BE54;
+    border-radius: 150px;
+    background: #fff;
+    padding: 12px;
+    font-weight: 500;
+    color: #222;
+}
+
+
+/* ⚠️ ข้อแนะนำ: ตัวเลือกแรกแบบ placeholder */
+.add-form select option[disabled] {
+    color: #999;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+}
+
+.confirm-btn {
+    background-color: #78dd92;
+    border: none;
+    border-radius: 18px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #f46c6c;
+    border: none;
+    border-radius: 18px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+}
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.popup-box {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    width: 300px;
+}
+
+.popup-box p {
+    font-size: 16px;
+    white-space: pre-line;
+    text-align: center;
+}
+
+
+.popup-sub {
+    color: #333;
+    font-size: 14px;
+}
+
+.popup-actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 16px;
+}

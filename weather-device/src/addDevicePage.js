@@ -14,7 +14,7 @@ function AddDevicePage() {
     useEffect(() => {
         const fetchStations = async () => {
             try {
-                const res = await fetch('http://localhost:3001/api/stations');
+                const res = await fetch('http://localhost:3001/api/weather_station/stations');
                 const data = await res.json();
                 setStations(data);
             } catch (err) {
@@ -33,7 +33,7 @@ function AddDevicePage() {
         }
 
         try {
-            const res = await fetch('http://localhost:3001/api/device', {
+            const res = await fetch('http://localhost:3001/api/weather_station/add/device', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ device_id: deviceId, station_signature: selectedStation }),
