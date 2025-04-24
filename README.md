@@ -1,6 +1,6 @@
 How to use
 
-1.Download Folder All-manager-page
+1. Download Folder All-manager-page
 
 2. npm i
 
