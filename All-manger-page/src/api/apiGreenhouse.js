@@ -11,17 +11,42 @@ const db = mysql.createConnection({
 
 // ✅ ดึงรายชื่ออุปกรณ์
 router.get('/device', (req, res) => {
-    const sql = `
-      SELECT 
-          swg.device_id AS id,
-          swg.device_id AS name,
-          swg.status,
-          hf.name_house AS greenhouse_name
-      FROM sensor_weather_greenhouse swg
-      LEFT JOIN housefarm hf ON swg.greenhouse_id = hf.id_farm_house
-      WHERE swg.status = 'on' OR swg.status = 'off';
-  `;
-    db.query(sql, (err, results) => {
+    const { role, uid } = req.query;
+
+    let sql;
+    let params = [];
+
+    if (role === 'farmer') {
+        if (!uid) {
+            return res.status(400).json({ error: 'Missing uid for farmer role' });
+        }
+        sql = `
+            SELECT 
+              swg.device_id AS id,
+              swg.device_id AS name,
+              swg.status,
+              hf.name_house AS greenhouse_name
+            FROM acc_farmer AS af
+            INNER JOIN housefarm AS hf ON af.link_user = hf.link_user
+            INNER JOIN sensor_weather_greenhouse AS swg ON hf.id_farm_house = swg.greenhouse_id
+            WHERE af.uid_line = ?
+              AND swg.status != 'not register';
+    `;
+        params = [uid];
+    } else {
+        sql = `
+        SELECT  
+            swg.device_id AS id,
+            swg.device_id AS name, 
+            swg.status,
+            hf.name_house AS greenhouse_name
+        FROM sensor_weather_greenhouse as swg
+        INNER JOIN housefarm hf ON swg.greenhouse_id = hf.id_farm_house
+        WHERE swg.status IN ('on', 'off');
+    `;
+    }
+
+    db.query(sql, params, (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
         if (results.length === 0) {
             return res.json({ message: 'No devices found' });
