@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './AddDevicePage.module.css'; // ✅ ใช้ CSS Module
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Select from 'react-select';
 
 function AddDevicePage() {
@@ -10,19 +10,34 @@ function AddDevicePage() {
     const [greenhouses, setGreenhouses] = useState([]);
     const [showPopup, setShowPopup] = useState(false);
     const [popupMessage, setPopupMessage] = useState('');
+    const location = useLocation();
+    const role = location.state?.role;
+    const uid = location.state?.uid;
 
     useEffect(() => {
         const fetchGreenhouses = async () => {
             try {
-                const res = await fetch('http://localhost:3001/api/greenhouse/housefarm');
+                const query = new URLSearchParams({ role, uid }).toString();
+                // console.log(role ,uid);
+                const res = await fetch(`http://localhost:3001/api/greenhouse/housefarm?${query}`);
+
                 const data = await res.json();
-                setGreenhouses(data);
+                if (Array.isArray(data)) {
+                    setGreenhouses(data);
+                    setSelectedGreenhouse(data[0].id_farm_house);
+                } else {
+                    setGreenhouses([]);
+                }
+
             } catch (err) {
                 console.error('ดึงข้อมูลโรงเรือนไม่สำเร็จ', err);
+                setGreenhouses([]);
             }
         };
-        fetchGreenhouses();
-    }, []);
+        if (role) {
+            fetchGreenhouses();
+        }
+    }, [role, uid]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -147,7 +162,11 @@ function AddDevicePage() {
                                     onClick={() => {
                                         setShowPopup(false);
                                         if (popupMessage.includes('สำเร็จ')) {
-                                            navigate('/');
+                                            if (role && uid) {
+                                                navigate('/', { state: { role, uid } });
+                                            } else {
+                                                navigate('/');
+                                            }
                                         }
                                     }}
                                 >

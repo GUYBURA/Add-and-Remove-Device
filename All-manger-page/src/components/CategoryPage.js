@@ -4,8 +4,8 @@ import greenhouseIcon from '../images/sensorGH.svg';
 import pumpIcon from '../images/ControlPump.svg';
 import { useNavigate } from 'react-router-dom';
 
-const userRole = 'admin'; // หรือ 'farmer'
-
+const userRole = 'farmer'; // หรือ 'farmer'
+const userUid = 'U9dc7e4d3e19d44d0e5aaab17438073ba';
 const categories = [
   {
     id: 'weather',
@@ -60,7 +60,7 @@ function CategoryPage() {
               <div className={styles["content-bottom"]}>
                 <button
                   className={styles["manage-btn"]}
-                  onClick={() => navigate(`/devices/${cat.id}`)}
+                  onClick={() => navigate(`/devices/${cat.id}`, { state: { role: userRole, uid: userUid } })}
                 >
                   จัดการอุปกรณ์
                 </button>

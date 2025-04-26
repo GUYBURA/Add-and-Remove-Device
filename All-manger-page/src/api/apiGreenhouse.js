@@ -23,6 +23,9 @@ router.get('/device', (req, res) => {
   `;
     db.query(sql, (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
+        if (results.length === 0) {
+            return res.json({ message: 'No devices found' });
+        }
         res.json(results);
     });
 });
@@ -45,21 +48,47 @@ router.get('/device/:id', (req, res) => {
 });
 
 // ✅ ลบอุปกรณ์
-router.delete('/delete/device/:id', (req, res) => {
+router.put('/delete/device/:id', (req, res) => {
     const { id } = req.params;
-    const sql = `DELETE FROM sensor_weather_greenhouse WHERE device_id = ?`;
+    const sql = `
+      UPDATE sensor_weather_greenhouse 
+      SET status = 'not register', greenhouse_id = NULL 
+      WHERE device_id = ?
+    `;
     db.query(sql, [id], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
-        if (result.affectedRows === 0)
-            return res.status(404).json({ message: 'ไม่พบอุปกรณ์ที่ต้องการลบ' });
-        res.json({ message: 'ลบอุปกรณ์เรียบร้อยแล้ว' });
+        if (result.affectedRows === 0) return res.status(404).json({ message: 'ไม่พบอุปกรณ์ที่ต้องการอัปเดต' });
+        res.json({ message: 'แก้ไขข้อมูลเรียบร้อยแล้ว' });
     });
 });
 
 // ✅ ดึงรายการโรงเรือน
 router.get('/housefarm', (req, res) => {
-    const sql = `SELECT id_farm_house, name_house FROM housefarm WHERE status = 1;`;
-    db.query(sql, (err, results) => {
+    const { role, uid } = req.query;
+    let sql;
+    let params = [];
+
+    if (role === 'farmer') {
+        if (!uid) {
+            return res.status(400).json({ error: 'Missing uid for farmer role' });
+        }
+        sql = `
+            SELECT hf.id_farm_house, hf.name_house 
+            FROM housefarm AS hf
+            INNER JOIN acc_farmer AS af ON af.link_user = hf.link_user
+            WHERE af.uid_line = ? 
+              AND hf.status = 1
+        `;
+        params = [uid];
+    } else {
+        sql = `
+            SELECT id_farm_house, name_house 
+            FROM housefarm 
+            WHERE status = 1;
+        `;
+    }
+
+    db.query(sql, params, (err, results) => {   // ✅ ต้องใส่ params ตรงนี้
         if (err) return res.status(500).json({ message: 'ผิดพลาด', error: err.message });
         res.json(results);
     });

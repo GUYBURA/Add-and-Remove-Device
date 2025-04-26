@@ -32,16 +32,19 @@ router.get('/device/:id', (req, res) => {
     });
 });
 
-router.delete('/delete/device/:id', (req, res) => {
+router.put('/delete/device/:id', (req, res) => {
     const { id } = req.params;
-    const sql = `DELETE FROM sensor_weather_station WHERE device_id = ?`;
+    const sql = `
+      UPDATE sensor_weather_station 
+      SET status = 'not register', station_signature = NULL 
+      WHERE device_id = ?
+    `;
     db.query(sql, [id], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
-        if (result.affectedRows === 0) return res.status(404).json({ message: 'ไม่พบอุปกรณ์ที่ต้องการลบ' });
-        res.json({ message: 'ลบอุปกรณ์เรียบร้อยแล้ว' });
+        if (result.affectedRows === 0) return res.status(404).json({ message: 'ไม่พบอุปกรณ์ที่ต้องการอัปเดต' });
+        res.json({ message: 'แก้ไขข้อมูลเรียบร้อยแล้ว' });
     });
 });
-
 router.get('/stations', (req, res) => {
     const sql = `SELECT id_station, name FROM station_list WHERE is_use = 1`;
     db.query(sql, (err, results) => {

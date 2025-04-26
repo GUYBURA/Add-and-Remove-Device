@@ -10,22 +10,52 @@ const db = mysql.createConnection({
 });
 
 // ✅ ดึงรายชื่ออุปกรณ์ pump
+// ✅ ดึงรายชื่ออุปกรณ์
 router.get('/device', (req, res) => {
-    const sql = `
-      SELECT 
-          sp.device_id AS id,
-          sp.device_id AS name,
-          sp.status,
-          hf.name_house AS greenhouse_name
-      FROM sensor_pump sp
-      LEFT JOIN housefarm hf ON sp.greenhouse_pump_id = hf.id_farm_house
-      WHERE sp.status = 'on' OR sp.status = 'off';
-  `;
-    db.query(sql, (err, results) => {
+    const { role, uid } = req.query;
+
+    let sql;
+    let params = [];
+
+    if (role === 'farmer') {
+        if (!uid) {
+            return res.status(400).json({ error: 'Missing uid for farmer role' });
+        }
+        sql = `
+            SELECT 
+              sp.device_id AS id,
+              sp.device_id AS name,
+              sp.status,
+              hf.name_house AS greenhouse_name
+            FROM acc_farmer AS af
+            INNER JOIN housefarm AS hf ON af.link_user = hf.link_user
+            INNER JOIN sensor_pump AS sp ON hf.id_farm_house = sp.greenhouse_pump_id
+            WHERE af.uid_line = ?
+              AND sp.status != 'not register';
+    `;
+        params = [uid];
+    } else {
+        sql = `
+        SELECT  
+            sp.device_id AS id,
+            sp.device_id AS name, 
+            sp.status,
+            hf.name_house AS greenhouse_name
+        FROM sensor_pump as sp
+        INNER JOIN housefarm hf ON sp.greenhouse_pump_id = hf.id_farm_house
+        WHERE sp.status IN ('on', 'off');
+    `;
+    }
+
+    db.query(sql, params, (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
+        if (results.length === 0) {
+            return res.json({ message: 'No devices found' });
+        }
         res.json(results);
     });
 });
+
 
 // ✅ ดึงชื่อโรงเรือนของอุปกรณ์ pump
 router.get('/device/:id', (req, res) => {
@@ -44,21 +74,47 @@ router.get('/device/:id', (req, res) => {
 });
 
 // ✅ ลบอุปกรณ์ pump
-router.delete('/delete/device/:id', (req, res) => {
+router.put('/delete/device/:id', (req, res) => {
     const { id } = req.params;
-    const sql = `DELETE FROM sensor_pump WHERE device_id = ?`;
+    const sql = `
+      UPDATE sensor_pump 
+      SET status = 'not register', greenhouse_pump_id = NULL 
+      WHERE device_id = ?
+    `;
     db.query(sql, [id], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
-        if (result.affectedRows === 0)
-            return res.status(404).json({ message: 'ไม่พบอุปกรณ์ที่ต้องการลบ' });
-        res.json({ message: 'ลบอุปกรณ์เรียบร้อยแล้ว' });
+        if (result.affectedRows === 0) return res.status(404).json({ message: 'ไม่พบอุปกรณ์ที่ต้องการอัปเดต' });
+        res.json({ message: 'แก้ไขข้อมูลเรียบร้อยแล้ว' });
     });
 });
 
 // ✅ ดึงรายการโรงเรือน
 router.get('/housefarm', (req, res) => {
-    const sql = `SELECT id_farm_house, name_house FROM housefarm WHERE status = 1;`;
-    db.query(sql, (err, results) => {
+    const { role, uid } = req.query;
+    let sql;
+    let params = [];
+
+    if (role === 'farmer') {
+        if (!uid) {
+            return res.status(400).json({ error: 'Missing uid for farmer role' });
+        }
+        sql = `
+            SELECT hf.id_farm_house, hf.name_house 
+            FROM housefarm AS hf
+            INNER JOIN acc_farmer AS af ON af.link_user = hf.link_user
+            WHERE af.uid_line = ? 
+              AND hf.status = 1
+        `;
+        params = [uid];
+    } else {
+        sql = `
+            SELECT id_farm_house, name_house 
+            FROM housefarm 
+            WHERE status = 1;
+        `;
+    }
+
+    db.query(sql, params, (err, results) => {   // ✅ ต้องใส่ params ตรงนี้
         if (err) return res.status(500).json({ message: 'ผิดพลาด', error: err.message });
         res.json(results);
     });

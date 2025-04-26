@@ -43,7 +43,7 @@ function WeatherMainPage() {
   const confirmDelete = async () => {
     try {
       const res = await fetch(`http://localhost:3001/api/weather_station/delete/device/${selectedDevice}`, {
-        method: 'DELETE',
+        method: 'PUT',
       });
       const data = await res.json();
 
